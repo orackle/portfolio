@@ -25,7 +25,8 @@ const TAB_DATA = [
         content: (
             <ul className='list-disc pl-2'>
                 <li>Binghamton University - State University of New York (2024)</li>
-                <li>University of Alberta - Bachelor of Science: Specialization in Computer Science</li>
+                <li>University of Alberta - Bachelor of Science: Specialization in Computer Science (2021)</li>
+                <li>Aptech Institute - Web Development Course (2017)</li>
             </ul>
         )
     },
