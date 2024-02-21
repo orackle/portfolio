@@ -6,7 +6,7 @@ import Image from 'next/image';
 
 const HeroSection = () => {
     return (
-        <section className="hero-section grid grid-cols-1 lg:grid-cols-12">
+        <section className="hero-section grid grid-cols-1 lg:grid-cols-12" id="hero">
             <div className="col-span-12 lg:col-span-7 place-self-center text-center sm:text-left">
                 <h1 className="hero-section__title mt-5 mb-4 text-4xl lg:text-6xl sm:text-5xl font-extrabold">
                     <span className='text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500'>Hello, I'm {" "}</span>
