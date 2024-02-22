@@ -3,15 +3,20 @@
 import React from 'react';
 import { TypeAnimation } from 'react-type-animation';
 import Image from 'next/image';
+import { motion } from 'framer-motion';
 
 const HeroSection = () => {
     return (
-        <section className="hero-section grid grid-cols-1 lg:grid-cols-12" id="hero">
-            <div className="col-span-12 lg:col-span-7 place-self-center text-center sm:text-left">
-                <h1 className="hero-section__title mt-5 mb-4 text-4xl lg:text-6xl sm:text-5xl font-extrabold">
-                    <span className='text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500'>Hello, I'm {" "}</span>
+        <section className="hero-section grid grid-cols-1 lg:grid-cols-12 lg:py-16" id="hero">
+          
+            <motion.div
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }} className="col-span-12 lg:col-span-7 place-self-center text-center sm:text-left">
+                <h1 className="hero-section__title mt-5 mb-4 text-4xl lg:text-5xl sm:text-5xl font-extrabold">
+                <span className='text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-primary-500 to-pink-500'>Hello, I'm {" "}</span>
                     <br />
-                    <span className="block lg:inline-block lg:min-w-[680px]"> {/* Adjust the width as needed */}
+                    <span className="block lg:inline-block lg:min-w-[680px] text-white"> {/* Adjust the width as needed */}
                         <TypeAnimation
                             sequence={[
                                 'Debbie',
@@ -25,17 +30,19 @@ const HeroSection = () => {
                             ]}
                             wrapper="span"
                             speed={20}
-                            style={{ display: 'inline-block' }}
+                            style={{ display: 'inline-block' , color: 'white'}}
                             repeat={Infinity}
                         />
                     </span>
                 </h1>
-                <p className="hero-section__description text-base sm:text-lg text-[#ADB7BE] text-lg mb-10 lg:text-xl">I am searching for full-time Software Developer Roles</p>
-                <button className='px-6 py-3 mr-4 rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 hover:bg-slate-200 text-white w-full sm:w-fit' >Hire Me</button>
+                <p className="hero-section__description text-base sm:text-lg text-[#ADB7BE] text-lg mb-10 lg:text-xl">I love crafting digital experiences that make people's lives easier. Currently looking for Software Engineer roles. </p>
+                <button className='px-6 py-3 mr-4 rounded-full bg-gradient-to-br from-blue-500 via-primary-500 to-secondary-500 hover:bg-slate-200 text-white w-full sm:w-fit' >Hire Me</button>
                 <button className='px-6 py-3 mr-4 mt-3 rounded-full bg-transparent hover:bg-slate-800 text-white border border-white w-full sm:w-fit'> Download CV</button>
-            </div>
+            </motion.div>
 
-            <div className="col-span-12 lg:col-span-5 place-self-center mt-8 lg:mt-0">
+            <motion.div initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8 }} className="col-span-8 lg:col-span-5 place-self-center mt-8 lg:mt-0">
                 <div className="rounded-full overflow-hidden w-[200px] h-[200px] relative mx-auto lg:mx-0">
                     <Image
                         src="/images/self3.jpg"
@@ -46,7 +53,7 @@ const HeroSection = () => {
                         layout="responsive"
                     />
                 </div>
-            </div>
+            </motion.div>
         </section>
     );
 };

@@ -3,6 +3,7 @@ import React, {useTransition, useState} from 'react';
 import TabButton from './TabButton';    
 import Image from 'next/image';
 
+import {motion} from 'framer-motion';
 const TAB_DATA = [
     {
         title: 'Skills',
@@ -11,11 +12,12 @@ const TAB_DATA = [
             <ul className='list-disc pl-2'>
                 <li>Python (Django, Flask)</li>
                 <li> Java</li>
-                <li>PostgreSQL, Oracle</li>
+                <li>PostgreSQL, Oracle, Firebase, MongoDB</li>
                 <li>Node.js</li>
                 <li>C/C++</li>
                 <li>JavaScript</li>
                 <li>React</li>
+                <li>Adobe XD</li>
             </ul>
         )
     },
@@ -54,7 +56,9 @@ const AboutSection = () => {
     return <section className='text-white' id="about">
         <div className='md:grid md:grid-cols-2 gap-8 items-center py-8 px-4 xl:gap-16 sm:py-16 xl:px-16'>
             <Image src="/images/about-image.png" width={500} height={500} alt="About Image" className='rounded-lg'/>
-            <div className='mt-4 md:mt-0 text-left flex flex-col h-full '>
+            <motion.div initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 2 }} className='mt-4 md:mt-0 text-left flex flex-col h-full '>
                 <h2 className='text-4xl font-bold text-white mb-4'>About Me</h2>
                 <p className='text-base lg:text-lg '> Hi there! I'm a caffeine enthusiast, enjoy reading manga and fiction, and had a love for solving puzzles as young as I could remember. I have experience working with Python (Django, Flask), PostgreSQL, Oracle, HTML, CSS (Tailwind, Bootstrap), JavaScript (React, Node.js), and Git. 
 
@@ -88,7 +92,7 @@ const AboutSection = () => {
             </TabButton>
           </div> 
           <div className='mt-8'>{TAB_DATA.find((data) => data.id === tab).content}</div>
-          </div> 
+          </motion.div> 
           </div>    
     </section>
 
