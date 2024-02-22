@@ -4,6 +4,7 @@ import React from 'react';
 import { TypeAnimation } from 'react-type-animation';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 const HeroSection = () => {
     return (
@@ -36,8 +37,8 @@ const HeroSection = () => {
                     </span>
                 </h1>
                 <p className="hero-section__description text-base sm:text-lg text-[#ADB7BE] text-lg mb-10 lg:text-xl">I love crafting digital experiences that make people's lives easier. Currently looking for Software Engineer roles. </p>
-                <button className='px-6 py-3 mr-4 rounded-full bg-gradient-to-br from-blue-500 via-primary-500 to-secondary-500 hover:bg-slate-200 text-white w-full sm:w-fit' >Hire Me</button>
-                <button className='px-6 py-3 mr-4 mt-3 rounded-full bg-transparent hover:bg-slate-800 text-white border border-white w-full sm:w-fit'> Download CV</button>
+                <Link href="https://linkedin.com/in/ghosh-debangana"><button className='px-6 py-3 mr-4 rounded-full bg-gradient-to-br from-blue-500 via-primary-500 to-secondary-500 hover:bg-slate-200 text-white w-full sm:w-fit' >Hire Me</button></Link>
+                <Link href="https://drive.google.com/file/d/1395UfreCMqC-SjMS58_MCrcvpbrUpX0Z/view?usp=sharing"><button className='px-6 py-3 mr-4 mt-3 rounded-full bg-transparent hover:bg-slate-800 text-white border border-white w-full sm:w-fit'> Download CV</button></Link>
             </motion.div>
 
             <motion.div initial={{ opacity: 0, scale: 0.5 }}
