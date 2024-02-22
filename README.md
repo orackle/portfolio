@@ -1,5 +1,9 @@
 ## Portfolio Site
+
+
 A very simple portfolio site created with Next.js and Framer Motion, hosted on Vercel. 
+
+
 # Goals
 
 - [x] Work with Next.js 13
