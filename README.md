@@ -1,9 +1,12 @@
 ## Portfolio Site
 
 # Goals
-[x] Learn Next.js
-[x] Understand Stateful concepts
-[x] Learn Deployment on Vercel
+
+- [x] Work with Next.js 13
+- [x] Learn deployment on Vercel
+- [x] Work with React States and Components
+
+
 
 # Credit
 
