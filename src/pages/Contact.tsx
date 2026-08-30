@@ -1,9 +1,11 @@
 import { profile } from "../data/profile";
 import Footer from "../components/Footer";
 import { usePageTransition } from "../hooks/usePageTransition";
+import { useScrollChain } from "../hooks/useScrollChain";
 
 export default function Contact() {
   const ref = usePageTransition<HTMLDivElement>();
+  useScrollChain(ref, null, "/about");
 
   return (
     <div ref={ref}>
@@ -22,7 +24,7 @@ export default function Contact() {
           <a href={profile.linkedin} target="_blank" rel="noreferrer">
             LinkedIn
           </a>
-          <a href={profile.resumeUrl} download>
+          <a href={profile.resumeUrl} download="debangana_ai_engineer.pdf">
             Download CV
           </a>
         </div>

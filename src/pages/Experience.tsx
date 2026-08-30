@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { experience } from "../data/experience";
 import { education } from "../data/education";
 import { certifications } from "../data/certifications";
 import Footer from "../components/Footer";
 import { usePageTransition } from "../hooks/usePageTransition";
+import { useScrollChain } from "../hooks/useScrollChain";
 
 function getCompanyBadge(issuer: string) {
   const norm = issuer.toLowerCase();
@@ -56,70 +58,94 @@ function getCompanyBadge(issuer: string) {
   return null;
 }
 
+type Tab = "work" | "education" | "certifications";
+
+const TABS: { value: Tab; label: string }[] = [
+  { value: "work", label: "Work Experience" },
+  { value: "education", label: "Education" },
+  { value: "certifications", label: "Certifications" },
+];
+
 export default function Experience() {
+  const [active, setActive] = useState<Tab>("certifications");
   const ref = usePageTransition<HTMLDivElement>();
+  useScrollChain(ref, "/about", "/works");
 
   return (
     <div ref={ref}>
       <header className="page-header">
         <span className="page-header__eyebrow">Experience &amp; Education</span>
+        <div className="filter-row">
+          {TABS.map((tab) => (
+            <button
+              key={tab.value}
+              className={`filter-pill${active === tab.value ? " is-active" : ""}`}
+              onClick={() => setActive(tab.value)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
       </header>
 
-      <section className="experience-section" id="work-experience">
-        <span className="page-header__eyebrow">Work Experience</span>
-        <div className="experience-list">
-          {experience.map((exp) => (
-            <div className="experience-card" key={exp.company}>
-              <div className="experience-card__header">
-                <span className="experience-card__role">{exp.role}</span>
-                <span className="experience-card__company">{exp.company}</span>
-                <span className="experience-card__period">{exp.period}</span>
+      {active === "work" && (
+        <section className="experience-section">
+          <div className="experience-list">
+            {experience.map((exp) => (
+              <div className="experience-card" key={exp.company}>
+                <div className="experience-card__header">
+                  <span className="experience-card__role">{exp.role}</span>
+                  <span className="experience-card__company">{exp.company}</span>
+                  <span className="experience-card__period">{exp.period}</span>
+                </div>
+                <ul className="experience-card__desc">
+                  {exp.description.map((bullet, idx) => (
+                    <li key={idx}>{bullet}</li>
+                  ))}
+                </ul>
+                <div className="experience-card__skills">
+                  {exp.skills.map((skill) => (
+                    <span className="experience-card__skill-tag" key={skill}>
+                      {skill}
+                    </span>
+                  ))}
+                </div>
               </div>
-              <ul className="experience-card__desc">
-                {exp.description.map((bullet, idx) => (
-                  <li key={idx}>{bullet}</li>
-                ))}
-              </ul>
-              <div className="experience-card__skills">
-                {exp.skills.map((skill) => (
-                  <span className="experience-card__skill-tag" key={skill}>
-                    {skill}
-                  </span>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+            ))}
+          </div>
+        </section>
+      )}
 
-      <section className="education-section" id="education">
-        <span className="page-header__eyebrow">Education</span>
-        <div className="education-list">
-          {education.map((edu) => (
-            <div className="education-card" key={edu.school}>
-              <span className="education-card__degree">{edu.degree}</span>
-              <span className="education-card__school">{edu.school}</span>
-              <span className="education-card__period">{edu.period}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="cert-section" id="certifications">
-        <span className="page-header__eyebrow">Certifications</span>
-        <div className="cert-grid">
-          {certifications.map((cert) => (
-            <div className="cert-card" key={cert.title}>
-              <div className="cert-card__header">
-                {getCompanyBadge(cert.issuer)}
-                <span className="cert-card__issuer">{cert.issuer}</span>
+      {active === "education" && (
+        <section className="education-section">
+          <div className="education-list">
+            {education.map((edu) => (
+              <div className="education-card" key={edu.school}>
+                <span className="education-card__degree">{edu.degree}</span>
+                <span className="education-card__school">{edu.school}</span>
+                <span className="education-card__period">{edu.period}</span>
               </div>
-              <span className="cert-card__title">{cert.title}</span>
-              {cert.date && <span className="cert-card__date">Issued {cert.date}</span>}
-            </div>
-          ))}
-        </div>
-      </section>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {active === "certifications" && (
+        <section className="cert-section">
+          <div className="cert-grid">
+            {certifications.map((cert) => (
+              <div className="cert-card" key={cert.title}>
+                <div className="cert-card__header">
+                  {getCompanyBadge(cert.issuer)}
+                  <span className="cert-card__issuer">{cert.issuer}</span>
+                </div>
+                <span className="cert-card__title">{cert.title}</span>
+                {cert.date && <span className="cert-card__date">Issued {cert.date}</span>}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       <Footer />
     </div>

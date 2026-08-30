@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type TouchEvent } from "react";
 import pixelCat from "../assets/pixel_cat_blue_eyes.svg";
 import pixelCatBlink from "../assets/pixel_cat_blue_eyes_blink.svg";
 
@@ -185,10 +185,13 @@ export default function CatGame({ onClose }: CatGameProps) {
     GHOST_START.map(([row, col], i) => ({
       col,
       row,
+      homeRow: row,
+      homeCol: col,
       dir: { dx: 0, dy: 0 } as Vec,
       color: GHOST_COLORS[i % GHOST_COLORS.length],
     }))
   );
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
 
   const catImg = useRef<HTMLImageElement | null>(null);
   const catBlinkImg = useRef<HTMLImageElement | null>(null);
@@ -218,6 +221,8 @@ export default function CatGame({ onClose }: CatGameProps) {
     ghosts.current = GHOST_START.map(([row, col], i) => ({
       col,
       row,
+      homeRow: row,
+      homeCol: col,
       dir: { dx: 0, dy: 0 } as Vec,
       color: GHOST_COLORS[i % GHOST_COLORS.length],
     }));
@@ -373,15 +378,23 @@ export default function CatGame({ onClose }: CatGameProps) {
       const frozen = freezeFramesRef.current > 0;
       for (const g of ghosts.current) {
         if (!frozen) ghostChase(g);
-        if (frozen) continue;
         const dist = (g.col - player.current.col) ** 2 + (g.row - player.current.row) ** 2;
         if (dist < 0.35) {
-          setGameState("GAME_OVER");
-          if (scoreRef.current > highScore) {
-            setHighScore(scoreRef.current);
-            localStorage.setItem("portfolio-pac-cat-highscore", scoreRef.current.toString());
+          if (frozen) {
+            // eaten — send it home and pocket a bonus, immunity holds
+            g.col = g.homeCol;
+            g.row = g.homeRow;
+            g.dir = { dx: 0, dy: 0 };
+            scoreRef.current += 5;
+            setScore(scoreRef.current);
+          } else {
+            setGameState("GAME_OVER");
+            if (scoreRef.current > highScore) {
+              setHighScore(scoreRef.current);
+              localStorage.setItem("portfolio-pac-cat-highscore", scoreRef.current.toString());
+            }
+            break;
           }
-          break;
         }
       }
     };
@@ -439,6 +452,26 @@ export default function CatGame({ onClose }: CatGameProps) {
     };
   }, [gameState, highScore]);
 
+  const handleTouchStart = (e: TouchEvent) => {
+    const t = e.touches[0];
+    touchStart.current = { x: t.clientX, y: t.clientY };
+  };
+
+  const handleTouchEnd = (e: TouchEvent) => {
+    const start = touchStart.current;
+    touchStart.current = null;
+    if (!start) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - start.x;
+    const dy = t.clientY - start.y;
+    if (Math.abs(dx) < 24 && Math.abs(dy) < 24) return;
+    if (Math.abs(dx) > Math.abs(dy)) {
+      queueDir(dx > 0 ? DIRS.right : DIRS.left);
+    } else {
+      queueDir(dy > 0 ? DIRS.down : DIRS.up);
+    }
+  };
+
   const overlayText =
     gameState === "WIN"
       ? { title: "ALL TREATS FOUND!", body: `Final Score: ${score}` }
@@ -460,7 +493,7 @@ export default function CatGame({ onClose }: CatGameProps) {
         </div>
       </div>
 
-      <div className="cat-game__screen">
+      <div className="cat-game__screen" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
         <canvas
           ref={canvasRef}
           width={COLS * CELL}
@@ -472,7 +505,7 @@ export default function CatGame({ onClose }: CatGameProps) {
           <div className="cat-game__overlay">
             <h2 className="cat-game__title">PAC-CAT</h2>
             <p className="cat-game__instruction">
-              Arrows, WASD, or the buttons below to move — collect every star, grab the yarn ball to freeze the
+              Arrows, WASD, or swipe to move — collect every star, grab the yarn ball to freeze (and eat!) the
               ghosts
             </p>
             <button type="button" className="cat-game__btn" onClick={startGame}>
@@ -490,23 +523,6 @@ export default function CatGame({ onClose }: CatGameProps) {
             </button>
           </div>
         )}
-      </div>
-
-      <div className="cat-game__dpad" aria-hidden="true">
-        <span />
-        <button type="button" onClick={() => queueDir(DIRS.up)} aria-label="Move up">
-          ↑
-        </button>
-        <span />
-        <button type="button" onClick={() => queueDir(DIRS.left)} aria-label="Move left">
-          ←
-        </button>
-        <button type="button" onClick={() => queueDir(DIRS.down)} aria-label="Move down">
-          ↓
-        </button>
-        <button type="button" onClick={() => queueDir(DIRS.right)} aria-label="Move right">
-          →
-        </button>
       </div>
     </div>
   );

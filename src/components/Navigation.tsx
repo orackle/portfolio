@@ -39,43 +39,10 @@ function DropdownPanel({ onNavigate }: { onNavigate: () => void }) {
   );
 }
 
-const EXPERIENCE_SUBLINKS = [
-  { label: "Work Experience", to: "/experience#work-experience" },
-  { label: "Education", to: "/experience#education" },
-  { label: "Certifications", to: "/experience#certifications" },
-];
-
-function ExperienceDropdownPanel({ onNavigate }: { onNavigate: () => void }) {
-  const panelRef = useRef<HTMLUListElement>(null);
-
-  useEffect(() => {
-    if (!panelRef.current || prefersReducedMotion()) return;
-    gsap.fromTo(
-      panelRef.current,
-      { opacity: 0, y: -8 },
-      { opacity: 1, y: 0, duration: 0.2, ease: "power2.out" }
-    );
-  }, []);
-
-  return (
-    <ul className="nav__dropdown-panel" ref={panelRef}>
-      {EXPERIENCE_SUBLINKS.map((link) => (
-        <li key={link.to}>
-          <NavLink to={link.to} onClick={onNavigate}>
-            {link.label}
-          </NavLink>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
 export default function Navigation() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [worksOpen, setWorksOpen] = useState(false);
-  const [experienceOpen, setExperienceOpen] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout>>();
-  const experienceCloseTimer = useRef<ReturnType<typeof setTimeout>>();
 
   const openWorks = () => {
     clearTimeout(closeTimer.current);
@@ -83,14 +50,6 @@ export default function Navigation() {
   };
   const scheduleCloseWorks = () => {
     closeTimer.current = setTimeout(() => setWorksOpen(false), 150);
-  };
-
-  const openExperience = () => {
-    clearTimeout(experienceCloseTimer.current);
-    setExperienceOpen(true);
-  };
-  const scheduleCloseExperience = () => {
-    experienceCloseTimer.current = setTimeout(() => setExperienceOpen(false), 150);
   };
 
   return (
@@ -111,17 +70,10 @@ export default function Navigation() {
             </NavLink>
             {worksOpen && <DropdownPanel onNavigate={() => setWorksOpen(false)} />}
           </li>
-          <li
-            className="nav__dropdown"
-            onMouseEnter={openExperience}
-            onMouseLeave={scheduleCloseExperience}
-          >
+          <li>
             <NavLink to="/experience" className={({ isActive }) => (isActive ? "is-active" : "")}>
-              Experience ▾
+              Experience
             </NavLink>
-            {experienceOpen && (
-              <ExperienceDropdownPanel onNavigate={() => setExperienceOpen(false)} />
-            )}
           </li>
           <li>
             <NavLink to="/about" className={({ isActive }) => (isActive ? "is-active" : "")}>
@@ -137,7 +89,7 @@ export default function Navigation() {
 
         <div className="nav__right">
           <div className="nav__socials nav__socials--desktop">
-            <a href={profile.resumeUrl} download>
+            <a href={profile.resumeUrl} download="debangana_ai_engineer.pdf">
               CV
             </a>
             <a href={profile.github} target="_blank" rel="noreferrer">

@@ -17,7 +17,7 @@ export default function Works() {
     isCategory(catParam) ? catParam : "all"
   );
   const ref = usePageTransition<HTMLDivElement>();
-  useScrollChain(ref, "/contact", "/");
+  useScrollChain(ref, "/experience", "/");
 
   useEffect(() => {
     setActive(isCategory(catParam) ? catParam : "all");

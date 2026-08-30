@@ -2,9 +2,11 @@ import { profile } from "../data/profile";
 import { techStack } from "../data/techStack";
 import Footer from "../components/Footer";
 import { usePageTransition } from "../hooks/usePageTransition";
+import { useScrollChain } from "../hooks/useScrollChain";
 
 export default function About() {
   const ref = usePageTransition<HTMLDivElement>();
+  useScrollChain(ref, "/contact", "/experience");
 
   return (
     <div ref={ref}>

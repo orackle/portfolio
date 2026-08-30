@@ -15,5 +15,5 @@ export const profile = {
     { value: "15+", label: "Completed projects" },
   ],
   photo: "/images/about.jpg",
-  resumeUrl: "/resume.pdf",
+  resumeUrl: "/debangana_ai_engineer.pdf",
 };
