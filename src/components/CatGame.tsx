@@ -1,45 +1,203 @@
 import { useEffect, useRef, useState } from "react";
 import pixelCat from "../assets/pixel_cat_blue_eyes.svg";
 import pixelCatBlink from "../assets/pixel_cat_blue_eyes_blink.svg";
-import pixelFlower from "../assets/pixel_flower.svg";
 
 interface CatGameProps {
   onClose: () => void;
 }
 
-type GameState = "START" | "PLAYING" | "GAME_OVER";
+type GameState = "START" | "PLAYING" | "GAME_OVER" | "WIN";
+
+// ---------- maze ----------
+// a "waffle" lattice: single-cell pillars spaced two apart, always
+// surrounded by open corridor on all four sides — trivially fully
+// connected without hand-verifying a real labyrinth
+const COLS = 17;
+const ROWS = 17;
+const CELL = 24;
+
+const WALL = 0;
+const TREAT = 1;
+const EMPTY = 2;
+const HOUSE = 3;
+const YARN = 4;
+
+const SPARKLE_COLORS = ["#ff6b6b", "#ffd166", "#4fd1c5", "#a78bfa", "#f472b6", "#60a5fa", "#ffa552"];
+const YARN_SPOTS: Array<[number, number]> = [
+  [1, 1],
+  [1, 15],
+  [15, 1],
+  [15, 15],
+];
+const FREEZE_FRAMES = 360; // ~6s at 60fps
+
+function buildSparkleColors(): string[][] {
+  return Array.from({ length: ROWS }, () =>
+    Array.from({ length: COLS }, () => SPARKLE_COLORS[Math.floor(Math.random() * SPARKLE_COLORS.length)])
+  );
+}
+
+function buildMaze(): number[][] {
+  const grid: number[][] = Array.from({ length: ROWS }, () => Array(COLS).fill(TREAT));
+
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      if (r === 0 || r === ROWS - 1 || c === 0 || c === COLS - 1) {
+        grid[r][c] = WALL;
+      }
+    }
+  }
+
+  for (let r = 2; r < ROWS - 1; r += 2) {
+    for (let c = 2; c < COLS - 1; c += 2) {
+      grid[r][c] = WALL;
+    }
+  }
+
+  // ghost house — carve a small open room in the center, no treats
+  for (let r = 7; r <= 9; r++) {
+    for (let c = 7; c <= 9; c++) {
+      grid[r][c] = HOUSE;
+    }
+  }
+
+  // player spawn, bottom-center — no treat on the starting tile
+  grid[15][8] = EMPTY;
+
+  // glowy yarn balls tucked in the four corridors, near each corner
+  YARN_SPOTS.forEach(([r, c]) => {
+    grid[r][c] = YARN;
+  });
+
+  return grid;
+}
+
+function isWalkable(grid: number[][], row: number, col: number) {
+  if (row < 0 || row >= ROWS || col < 0 || col >= COLS) return false;
+  return grid[row][col] !== WALL;
+}
+
+// ---------- pixel-art ghost (8x8 grid scaled to a cell) ----------
+function drawGhost(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, color: string) {
+  const u = size / 8;
+  ctx.fillStyle = color;
+  ctx.fillRect(x + u * 2, y, u * 4, u);
+  ctx.fillRect(x + u, y + u, u * 6, u);
+  ctx.fillRect(x, y + u * 2, u * 8, u * 5);
+  // zigzag skirt
+  ctx.fillRect(x, y + u * 7, u, u);
+  ctx.fillRect(x + u * 2, y + u * 7, u, u);
+  ctx.fillRect(x + u * 4, y + u * 7, u, u);
+  ctx.fillRect(x + u * 6, y + u * 7, u, u);
+  // eyes
+  ctx.fillStyle = "#f5f6ff";
+  ctx.fillRect(x + u * 1.5, y + u * 2.5, u * 1.6, u * 2);
+  ctx.fillRect(x + u * 4.9, y + u * 2.5, u * 1.6, u * 2);
+  ctx.fillStyle = "#1c1c1c";
+  ctx.fillRect(x + u * 2, y + u * 3, u * 0.8, u);
+  ctx.fillRect(x + u * 5.4, y + u * 3, u * 0.8, u);
+}
+
+// a small four-point sparkle — the "diamond star" treat, glowing in its own color
+function drawSparkle(ctx: CanvasRenderingContext2D, cx: number, cy: number, size: number, color: string) {
+  ctx.save();
+  ctx.shadowColor = color;
+  ctx.shadowBlur = size * 1.4;
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - size);
+  ctx.lineTo(cx + size * 0.28, cy - size * 0.28);
+  ctx.lineTo(cx + size, cy);
+  ctx.lineTo(cx + size * 0.28, cy + size * 0.28);
+  ctx.lineTo(cx, cy + size);
+  ctx.lineTo(cx - size * 0.28, cy + size * 0.28);
+  ctx.lineTo(cx - size, cy);
+  ctx.lineTo(cx - size * 0.28, cy - size * 0.28);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+// a glowy yarn ball power-up — collecting it freezes the ghosts a while
+function drawYarnBall(ctx: CanvasRenderingContext2D, cx: number, cy: number, radius: number, pulse: number) {
+  const color = "#c964e0";
+  ctx.save();
+  ctx.shadowColor = color;
+  ctx.shadowBlur = radius * (1.6 + pulse * 0.6);
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.strokeStyle = "rgba(255,255,255,0.75)";
+  ctx.lineWidth = Math.max(1, radius * 0.14);
+  ctx.beginPath();
+  ctx.ellipse(cx, cy, radius * 0.85, radius * 0.35, Math.PI / 4, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.ellipse(cx, cy, radius * 0.85, radius * 0.35, -Math.PI / 4, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+}
+
+interface Vec {
+  dx: number;
+  dy: number;
+}
+
+const DIRS: Record<string, Vec> = {
+  up: { dx: 0, dy: -1 },
+  down: { dx: 0, dy: 1 },
+  left: { dx: -1, dy: 0 },
+  right: { dx: 1, dy: 0 },
+};
+
+const GHOST_COLORS = ["#e2543b", "#ff9fd6", "#3fa7d6", "#f2a541"];
+const GHOST_START: Array<[number, number]> = [
+  [7, 8],
+  [8, 7],
+  [8, 9],
+];
+
+const PLAYER_SPEED = 0.09;
+const GHOST_SPEED = 0.075;
+const CENTER_EPS = 0.06;
 
 export default function CatGame({ onClose }: CatGameProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
   const [gameState, setGameState] = useState<GameState>("START");
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState<number>(() => {
-    const stored = localStorage.getItem("portfolio-cat-game-highscore");
+    const stored = localStorage.getItem("portfolio-pac-cat-highscore");
     return stored ? parseInt(stored, 10) : 0;
   });
 
-  // Game variable refs to keep loop values synchronized without re-renders
   const stateRef = useRef<GameState>("START");
   const scoreRef = useRef(0);
-  const catY = useRef(130);
-  const catVy = useRef(0);
-  const isJumping = useRef(false);
-  const obstacles = useRef<{ x: number; width: number; height: number }[]>([]);
-  const spawnTimer = useRef(0);
+  const mazeRef = useRef<number[][]>(buildMaze());
+  const sparkleColorsRef = useRef<string[][]>(buildSparkleColors());
+  const treatsLeftRef = useRef(0);
+  const freezeFramesRef = useRef(0);
   const animationFrameId = useRef<number | null>(null);
 
-  // Preload game assets
+  const player = useRef({ col: 8, row: 15, dir: { dx: 0, dy: 0 }, next: { dx: 0, dy: 0 }, cellRow: 15, cellCol: 8 });
+  const ghosts = useRef(
+    GHOST_START.map(([row, col], i) => ({
+      col,
+      row,
+      dir: { dx: 0, dy: 0 } as Vec,
+      color: GHOST_COLORS[i % GHOST_COLORS.length],
+    }))
+  );
+
   const catImg = useRef<HTMLImageElement | null>(null);
   const catBlinkImg = useRef<HTMLImageElement | null>(null);
-  const flowerImg = useRef<HTMLImageElement | null>(null);
 
   useEffect(() => {
     stateRef.current = gameState;
   }, [gameState]);
 
   useEffect(() => {
-    // Preload images
     const img1 = new Image();
     img1.src = pixelCat;
     catImg.current = img1;
@@ -47,46 +205,55 @@ export default function CatGame({ onClose }: CatGameProps) {
     const img2 = new Image();
     img2.src = pixelCatBlink;
     catBlinkImg.current = img2;
-
-    const img3 = new Image();
-    img3.src = pixelFlower;
-    flowerImg.current = img3;
   }, []);
 
-  const jump = () => {
-    if (!isJumping.current && stateRef.current === "PLAYING") {
-      catVy.current = -10.5;
-      isJumping.current = true;
-    }
-  };
-
   const startGame = () => {
-    obstacles.current = [];
+    mazeRef.current = buildMaze();
+    sparkleColorsRef.current = buildSparkleColors();
+    treatsLeftRef.current = mazeRef.current.flat().filter((t) => t === TREAT).length;
+    freezeFramesRef.current = 0;
     scoreRef.current = 0;
     setScore(0);
-    catY.current = 130;
-    catVy.current = 0;
-    isJumping.current = false;
-    spawnTimer.current = 0;
+    player.current = { col: 8, row: 15, dir: { dx: 0, dy: 0 }, next: { dx: 0, dy: 0 }, cellRow: 15, cellCol: 8 };
+    ghosts.current = GHOST_START.map(([row, col], i) => ({
+      col,
+      row,
+      dir: { dx: 0, dy: 0 } as Vec,
+      color: GHOST_COLORS[i % GHOST_COLORS.length],
+    }));
     setGameState("PLAYING");
+  };
+
+  const queueDir = (dir: Vec) => {
+    player.current.next = dir;
+    if (stateRef.current === "START" || stateRef.current === "GAME_OVER" || stateRef.current === "WIN") {
+      startGame();
+    }
   };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.code === "Space" || e.code === "ArrowUp") {
+      const map: Record<string, Vec> = {
+        ArrowUp: DIRS.up,
+        KeyW: DIRS.up,
+        ArrowDown: DIRS.down,
+        KeyS: DIRS.down,
+        ArrowLeft: DIRS.left,
+        KeyA: DIRS.left,
+        ArrowRight: DIRS.right,
+        KeyD: DIRS.right,
+      };
+      if (map[e.code]) {
         e.preventDefault();
-        if (stateRef.current === "PLAYING") {
-          jump();
-        } else if (stateRef.current === "START" || stateRef.current === "GAME_OVER") {
-          startGame();
-        }
+        queueDir(map[e.code]);
+      } else if (e.code === "Space" || e.code === "Enter") {
+        e.preventDefault();
+        if (stateRef.current !== "PLAYING") startGame();
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   useEffect(() => {
@@ -95,121 +262,167 @@ export default function CatGame({ onClose }: CatGameProps) {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    let obstacleSpeed = 4.5;
     let blinkToggle = false;
     let blinkTimer = 0;
+    let frameCount = 0;
+    const css = getComputedStyle(canvas);
+    const wallColor = css.getPropertyValue("--border").trim() || "#8a8a8a";
+    const treatColor = css.getPropertyValue("--accent").trim() || "#e0a458";
+    const bgColor = css.getPropertyValue("--bg").trim() || "#ffffff";
+
+    function tryMove(entity: { col: number; row: number; dir: Vec }, wanted: Vec, speed: number) {
+      const nearCenterCol = Math.abs(entity.col - Math.round(entity.col)) < CENTER_EPS;
+      const nearCenterRow = Math.abs(entity.row - Math.round(entity.row)) < CENTER_EPS;
+
+      if (nearCenterCol && nearCenterRow) {
+        const rCol = Math.round(entity.col);
+        const rRow = Math.round(entity.row);
+        entity.col = rCol;
+        entity.row = rRow;
+
+        if ((wanted.dx !== 0 || wanted.dy !== 0) && isWalkable(mazeRef.current, rRow + wanted.dy, rCol + wanted.dx)) {
+          entity.dir = wanted;
+        } else if (!isWalkable(mazeRef.current, rRow + entity.dir.dy, rCol + entity.dir.dx)) {
+          entity.dir = { dx: 0, dy: 0 };
+        }
+      }
+
+      entity.col += entity.dir.dx * speed;
+      entity.row += entity.dir.dy * speed;
+    }
+
+    function ghostChase(g: { col: number; row: number; dir: Vec }) {
+      const nearCenterCol = Math.abs(g.col - Math.round(g.col)) < CENTER_EPS;
+      const nearCenterRow = Math.abs(g.row - Math.round(g.row)) < CENTER_EPS;
+
+      if (nearCenterCol && nearCenterRow) {
+        const rCol = Math.round(g.col);
+        const rRow = Math.round(g.row);
+        g.col = rCol;
+        g.row = rRow;
+
+        const options = Object.values(DIRS).filter((d) => {
+          const reverse = d.dx === -g.dir.dx && d.dy === -g.dir.dy;
+          if (reverse && (g.dir.dx !== 0 || g.dir.dy !== 0)) return false;
+          return isWalkable(mazeRef.current, rRow + d.dy, rCol + d.dx);
+        });
+
+        if (options.length > 0) {
+          let choice: Vec;
+          if (Math.random() < 0.2) {
+            choice = options[Math.floor(Math.random() * options.length)];
+          } else {
+            choice = options.reduce((best, d) => {
+              const bestDist = (rCol + best.dx - player.current.col) ** 2 + (rRow + best.dy - player.current.row) ** 2;
+              const dDist = (rCol + d.dx - player.current.col) ** 2 + (rRow + d.dy - player.current.row) ** 2;
+              return dDist < bestDist ? d : best;
+            }, options[0]);
+          }
+          g.dir = choice;
+        } else {
+          g.dir = { dx: -g.dir.dx, dy: -g.dir.dy };
+        }
+      }
+
+      g.col += g.dir.dx * GHOST_SPEED;
+      g.row += g.dir.dy * GHOST_SPEED;
+    }
 
     const updateGame = () => {
       if (stateRef.current !== "PLAYING") return;
 
-      // Increment score
-      scoreRef.current += 1;
-      if (scoreRef.current % 10 === 0) {
-        setScore(Math.floor(scoreRef.current / 10));
-      }
+      frameCount++;
+      if (freezeFramesRef.current > 0) freezeFramesRef.current--;
 
-      // Physics
-      catY.current += catVy.current;
-      catVy.current += 0.55; // Gravity
+      tryMove(player.current, player.current.next, PLAYER_SPEED);
 
-      // Ground limit (internal height is 200, cat height is 40)
-      if (catY.current >= 130) {
-        catY.current = 130;
-        catVy.current = 0;
-        isJumping.current = false;
-      }
+      // fire pickup exactly once per cell entered — proximity-window checks can
+      // skip a cell entirely depending on how the float step lands relative to
+      // the window, since the step size and window were close enough to alias
+      const pRow = Math.round(player.current.row);
+      const pCol = Math.round(player.current.col);
+      if (pRow !== player.current.cellRow || pCol !== player.current.cellCol) {
+        player.current.cellRow = pRow;
+        player.current.cellCol = pCol;
 
-      // Cat blinking state
-      blinkTimer++;
-      if (blinkTimer > 120) {
-        if (Math.random() < 0.05) {
-          blinkToggle = !blinkToggle;
-          blinkTimer = 0;
+        if (mazeRef.current[pRow][pCol] === TREAT) {
+          mazeRef.current[pRow][pCol] = EMPTY;
+          scoreRef.current += 1;
+          treatsLeftRef.current -= 1;
+          setScore(scoreRef.current);
+          if (treatsLeftRef.current <= 0) {
+            setGameState("WIN");
+            if (scoreRef.current > highScore) {
+              setHighScore(scoreRef.current);
+              localStorage.setItem("portfolio-pac-cat-highscore", scoreRef.current.toString());
+            }
+            return;
+          }
+        } else if (mazeRef.current[pRow][pCol] === YARN) {
+          mazeRef.current[pRow][pCol] = EMPTY;
+          freezeFramesRef.current = FREEZE_FRAMES;
         }
       }
 
-      // Obstacle speed dynamic scaling
-      obstacleSpeed = 5.8 + Math.floor(scoreRef.current / 200) * 0.7;
-
-      // Obstacle spawning
-      spawnTimer.current--;
-      if (spawnTimer.current <= 0) {
-        // Spawn interval randomized (closer gaps for more challenge)
-        const minGap = 65;
-        const maxGap = 135;
-        spawnTimer.current = minGap + Math.random() * (maxGap - minGap);
-        obstacles.current.push({
-          x: 600,
-          width: 24,
-          height: 24,
-        });
+      blinkTimer++;
+      if (blinkTimer > 90 && Math.random() < 0.06) {
+        blinkToggle = !blinkToggle;
+        blinkTimer = 0;
       }
 
-      // Move obstacles and collision detection
-      for (let i = obstacles.current.length - 1; i >= 0; i--) {
-        const obs = obstacles.current[i];
-        obs.x -= obstacleSpeed;
-
-        // Collision Check: Cat is at x: 60, width: 40, height: 40
-        // Obstacle is at obs.x, y: 146 (200 - 24 ground line - 30 margin etc.), width: 24, height: 24
-        const catX = 60;
-        const catWidth = 32; // slightly smaller bounding box for better gameplay feel
-        const catHeight = 36;
-        const obsY = 146;
-
-        const collides =
-          catX < obs.x + obs.width &&
-          catX + catWidth > obs.x &&
-          catY.current < obsY + obs.height &&
-          catY.current + catHeight > obsY;
-
-        if (collides) {
-          // Game Over
+      const frozen = freezeFramesRef.current > 0;
+      for (const g of ghosts.current) {
+        if (!frozen) ghostChase(g);
+        if (frozen) continue;
+        const dist = (g.col - player.current.col) ** 2 + (g.row - player.current.row) ** 2;
+        if (dist < 0.35) {
           setGameState("GAME_OVER");
-          const finalScore = Math.floor(scoreRef.current / 10);
-          if (finalScore > highScore) {
-            setHighScore(finalScore);
-            localStorage.setItem("portfolio-cat-game-highscore", finalScore.toString());
+          if (scoreRef.current > highScore) {
+            setHighScore(scoreRef.current);
+            localStorage.setItem("portfolio-pac-cat-highscore", scoreRef.current.toString());
           }
           break;
-        }
-
-        // Remove offscreen obstacles
-        if (obs.x + obs.width < 0) {
-          obstacles.current.splice(i, 1);
         }
       }
     };
 
     const drawGame = () => {
-      ctx.clearRect(0, 0, 600, 200);
+      const W = COLS * CELL;
+      const H = ROWS * CELL;
+      ctx.fillStyle = bgColor;
+      ctx.fillRect(0, 0, W, H);
 
-      // Draw Ground Line
-      ctx.strokeStyle = "var(--border)";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(0, 170);
-      ctx.lineTo(600, 170);
-      ctx.stroke();
-
-      // Draw Cat
-      const catImageToDraw = blinkToggle ? catBlinkImg.current : catImg.current;
-      if (catImageToDraw && catImageToDraw.complete) {
-        ctx.drawImage(catImageToDraw, 60, catY.current, 40, 40);
-      } else {
-        // Fallback placeholder rectangle if image not loaded
-        ctx.fillStyle = "var(--accent)";
-        ctx.fillRect(60, catY.current, 40, 40);
+      const grid = mazeRef.current;
+      const pulse = Math.sin(frameCount * 0.12) * 0.5 + 0.5;
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const cell = grid[r][c];
+          if (cell === WALL) {
+            ctx.fillStyle = wallColor;
+            ctx.fillRect(c * CELL + 1, r * CELL + 1, CELL - 2, CELL - 2);
+          } else if (cell === TREAT) {
+            const color = sparkleColorsRef.current[r]?.[c] || treatColor;
+            drawSparkle(ctx, c * CELL + CELL / 2, r * CELL + CELL / 2, CELL * 0.16, color);
+          } else if (cell === YARN) {
+            drawYarnBall(ctx, c * CELL + CELL / 2, r * CELL + CELL / 2, CELL * 0.22, pulse);
+          }
+        }
       }
 
-      // Draw Obstacles
-      obstacles.current.forEach((obs) => {
-        if (flowerImg.current && flowerImg.current.complete) {
-          ctx.drawImage(flowerImg.current, obs.x, 146, obs.width, obs.height);
-        } else {
-          ctx.fillStyle = "var(--fg)";
-          ctx.fillRect(obs.x, 146, obs.width, obs.height);
-        }
+      const catImageToDraw = blinkToggle ? catBlinkImg.current : catImg.current;
+      const px = player.current.col * CELL;
+      const py = player.current.row * CELL;
+      if (catImageToDraw && catImageToDraw.complete) {
+        ctx.drawImage(catImageToDraw, px + 1, py + 1, CELL - 2, CELL - 2);
+      } else {
+        ctx.fillStyle = treatColor;
+        ctx.fillRect(px + 2, py + 2, CELL - 4, CELL - 4);
+      }
+
+      const frozen = freezeFramesRef.current > 0;
+      ghosts.current.forEach((g) => {
+        const color = frozen ? (pulse > 0.5 ? "#8fd3ff" : "#e0f2ff") : g.color;
+        drawGhost(ctx, g.col * CELL + 2, g.row * CELL + 2, CELL - 4, color);
       });
     };
 
@@ -222,68 +435,78 @@ export default function CatGame({ onClose }: CatGameProps) {
     gameLoop();
 
     return () => {
-      if (animationFrameId.current) {
-        cancelAnimationFrame(animationFrameId.current);
-      }
+      if (animationFrameId.current) cancelAnimationFrame(animationFrameId.current);
     };
   }, [gameState, highScore]);
 
+  const overlayText =
+    gameState === "WIN"
+      ? { title: "ALL TREATS FOUND!", body: `Final Score: ${score}` }
+      : { title: "CAUGHT!", body: `Final Score: ${score}` };
+
   return (
-    <div className="cat-game" ref={containerRef} onClick={jump}>
+    <div className="cat-game" onContextMenu={(e) => e.preventDefault()}>
       <div className="cat-game__header">
-        <button type="button" className="cat-game__back" onClick={(e) => {
-          e.stopPropagation();
-          onClose();
-        }}>
+        <button
+          type="button"
+          className="cat-game__back"
+          onClick={() => onClose()}
+        >
           ← Go Back
         </button>
         <div className="cat-game__scores">
-          <span>HI-SCORE: {highScore.toString().padStart(5, "0")}</span>
-          <span>SCORE: {score.toString().padStart(5, "0")}</span>
+          <span>HI-SCORE: {highScore.toString().padStart(3, "0")}</span>
+          <span>TREATS: {score.toString().padStart(3, "0")}</span>
         </div>
       </div>
 
       <div className="cat-game__screen">
         <canvas
           ref={canvasRef}
-          width={600}
-          height={200}
+          width={COLS * CELL}
+          height={ROWS * CELL}
           className="cat-game__canvas"
         />
 
         {gameState === "START" && (
           <div className="cat-game__overlay">
-            <h2 className="cat-game__title">CAT RUNNER</h2>
-            <p className="cat-game__instruction">Press Space, Up Arrow, or Click to Jump</p>
-            <button
-              type="button"
-              className="cat-game__btn"
-              onClick={(e) => {
-                e.stopPropagation();
-                startGame();
-              }}
-            >
+            <h2 className="cat-game__title">PAC-CAT</h2>
+            <p className="cat-game__instruction">
+              Arrows, WASD, or the buttons below to move — collect every star, grab the yarn ball to freeze the
+              ghosts
+            </p>
+            <button type="button" className="cat-game__btn" onClick={startGame}>
               Start Game
             </button>
           </div>
         )}
 
-        {gameState === "GAME_OVER" && (
+        {(gameState === "GAME_OVER" || gameState === "WIN") && (
           <div className="cat-game__overlay">
-            <h2 className="cat-game__title">GAME OVER</h2>
-            <p className="cat-game__instruction">Final Score: {score}</p>
-            <button
-              type="button"
-              className="cat-game__btn"
-              onClick={(e) => {
-                e.stopPropagation();
-                startGame();
-              }}
-            >
+            <h2 className="cat-game__title">{overlayText.title}</h2>
+            <p className="cat-game__instruction">{overlayText.body}</p>
+            <button type="button" className="cat-game__btn" onClick={startGame}>
               Play Again
             </button>
           </div>
         )}
+      </div>
+
+      <div className="cat-game__dpad" aria-hidden="true">
+        <span />
+        <button type="button" onClick={() => queueDir(DIRS.up)} aria-label="Move up">
+          ↑
+        </button>
+        <span />
+        <button type="button" onClick={() => queueDir(DIRS.left)} aria-label="Move left">
+          ←
+        </button>
+        <button type="button" onClick={() => queueDir(DIRS.down)} aria-label="Move down">
+          ↓
+        </button>
+        <button type="button" onClick={() => queueDir(DIRS.right)} aria-label="Move right">
+          →
+        </button>
       </div>
     </div>
   );

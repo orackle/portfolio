@@ -298,7 +298,7 @@ export default function Home() {
                         className="hero__name-cat-wrap"
                         ref={catWrapRef}
                         onClick={() => setGameActive(true)}
-                        aria-label="Play cat runner game"
+                        aria-label="Play Pac-Cat game"
                       >
                         <span className="hero__name-letter-text">{letter}</span>
                         <img

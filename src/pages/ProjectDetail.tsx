@@ -3,6 +3,7 @@ import { projects } from "../data/projects";
 import { useReveal } from "../hooks/useReveal";
 import { usePageTransition } from "../hooks/usePageTransition";
 import Footer from "../components/Footer";
+import TechIcon from "../components/TechIcon";
 
 export default function ProjectDetail() {
   const { slug } = useParams();
@@ -45,6 +46,7 @@ export default function ProjectDetail() {
           <div className="stack-grid">
             {project.stack.map((tech) => (
               <span key={tech} className="stack-pill">
+                <TechIcon tech={tech} className="stack-pill__icon" />
                 {tech}
               </span>
             ))}

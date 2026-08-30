@@ -15,8 +15,8 @@ export default function ProjectGrid({ projects }: { projects: Project[] }) {
 
   return (
     <div className="project-grid" ref={ref}>
-      {projects.map((project, i) => (
-        <ProjectCard key={project.slug} project={project} wide={i === 0} />
+      {projects.map((project) => (
+        <ProjectCard key={project.slug} project={project} />
       ))}
     </div>
   );
