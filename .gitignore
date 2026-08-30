@@ -1,0 +1,16 @@
+node_modules/
+dist/
+dist-ssr/
+*.local
+tsconfig.tsbuildinfo
+.claude/
+
+# editor/OS
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+
+# env
+.env
+.env.*
+!.env.example

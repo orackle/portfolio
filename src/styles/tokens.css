@@ -1,0 +1,65 @@
+:root {
+  --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --font-mono: "Martian Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --font-body: "Martian Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --grid-cell: 44px;
+  --border-w: 1px;
+  --content-max: 1680px;
+  --edge-pad: 56px;
+}
+
+@media (max-width: 900px) {
+  :root {
+    --grid-cell: 30px;
+    --edge-pad: 20px;
+  }
+}
+
+/* ---------- BLUE ---------- */
+[data-theme="blue"] {
+  --bg: #1c3ce0;
+  --bg-soft: #16309e;
+  --fg: #f5f6ff;
+  --muted: rgba(245, 246, 255, 0.55);
+  --border: rgba(245, 246, 255, 0.35);
+  --grid: rgba(245, 246, 255, 0.09);
+  --accent: #ffd400;
+  --tile-bg: rgba(245, 246, 255, 0.06);
+  --tile-border: rgba(245, 246, 255, 0.18);
+  --decor-a: #e2402a;
+  --decor-b: #ffd400;
+  --decor-c: #2f9e44;
+}
+
+/* ---------- GREEN ---------- */
+[data-theme="green"] {
+  --bg: #a9c61c;
+  --bg-soft: #93ae14;
+  --fg: #1c2e12;
+  --muted: rgba(28, 46, 18, 0.55);
+  --border: rgba(28, 46, 18, 0.3);
+  --grid: rgba(28, 46, 18, 0.08);
+  --accent: #7a2020;
+  --tile-bg: rgba(28, 46, 18, 0.05);
+  --tile-border: rgba(28, 46, 18, 0.2);
+  --decor-a: #d94f3c;
+  --decor-b: #e8c94a;
+  --decor-c: #3d6b23;
+}
+
+/* ---------- YELLOW ---------- */
+[data-theme="yellow"] {
+  --bg: #f0b429;
+  --bg-soft: #e7ab1e;
+  --fg: #201a06;
+  --muted: rgba(32, 26, 6, 0.6);
+  --border: rgba(32, 26, 6, 0.3);
+  --grid: rgba(32, 26, 6, 0.08);
+  --accent: #201a06;
+  --tile-bg: rgba(32, 26, 6, 0.05);
+  --tile-border: rgba(32, 26, 6, 0.22);
+  --decor-a: #4a2c12;
+  --decor-b: #d99a2b;
+  --decor-c: #6b4a1e;
+}
