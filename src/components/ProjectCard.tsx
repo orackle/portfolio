@@ -97,7 +97,6 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         ))}
       </div>
 
-      <span className="project-card__year">{project.year}</span>
       <span className="project-card__title" ref={titleRef}>
         {project.title}
       </span>

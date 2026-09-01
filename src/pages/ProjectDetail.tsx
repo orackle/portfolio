@@ -24,7 +24,6 @@ export default function ProjectDetail() {
           <Link to="/works" className="project-hero__back">
             ← Back to index
           </Link>
-          <span className="label-mono">{project.year}</span>
         </div>
 
         <div className="project-hero__grid">
