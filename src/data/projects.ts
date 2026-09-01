@@ -1,5 +1,11 @@
 export type ProjectCategory = "digital" | "systems" | "ml";
 
+export interface ShaderPalette {
+  color1: string;
+  color2: string;
+  color3: string;
+}
+
 export interface Project {
   slug: string;
   title: string;
@@ -14,6 +20,8 @@ export interface Project {
   roles: string;
   repoUrl: string;
   featured?: boolean;
+  /** Background gradient colors for the project card, unique per project. */
+  shaderColors: ShaderPalette;
 }
 
 export const projects: Project[] = [
@@ -35,6 +43,7 @@ export const projects: Project[] = [
     roles: "Model Training, Extension Development",
     repoUrl: "https://github.com/orackle/aegis",
     featured: true,
+    shaderColors: { color1: "#7c3aed", color2: "#4c1d95", color3: "#a78bfa" },
   },
   {
     slug: "polly",
@@ -53,6 +62,7 @@ export const projects: Project[] = [
     stack: ["Flask", "BeautifulSoup", "JavaScript", "HTML", "CSS"],
     roles: "Backend Development, Scraping Pipeline",
     repoUrl: "https://github.com/orackle/polly",
+    shaderColors: { color1: "#0891b2", color2: "#164e63", color3: "#67e8f9" },
   },
   {
     slug: "course-planner",
@@ -72,6 +82,7 @@ export const projects: Project[] = [
     roles: "Backend Development, Algorithm Design",
     repoUrl: "https://github.com/orackle/course-planner-app",
     featured: true,
+    shaderColors: { color1: "#2563eb", color2: "#1e3a8a", color3: "#93c5fd" },
   },
   {
     slug: "kafka-fleet-monitor",
@@ -92,6 +103,7 @@ export const projects: Project[] = [
     roles: "Systems Design, ML Pipeline, Backend Development",
     repoUrl: "https://github.com/orackle/kafka-fleet-monitor",
     featured: true,
+    shaderColors: { color1: "#ff6a1a", color2: "#c73c00", color3: "#FD4912" },
   },
   {
     slug: "neuron",
@@ -111,6 +123,7 @@ export const projects: Project[] = [
     roles: "Fullstack Development",
     repoUrl: "https://github.com/orackle/neuron",
     featured: true,
+    shaderColors: { color1: "#16a34a", color2: "#14532d", color3: "#86efac" },
   },
   {
     slug: "gdtuo-extension",
@@ -129,6 +142,7 @@ export const projects: Project[] = [
     stack: ["PyTorch", "Jupyter", "Machine Learning", "Research"],
     roles: "Research, Model Training",
     repoUrl: "https://github.com/orackle/gdtuo-extension",
+    shaderColors: { color1: "#db2777", color2: "#831843", color3: "#f9a8d4" },
   },
   {
     slug: "url-shortener",
@@ -146,6 +160,7 @@ export const projects: Project[] = [
     stack: ["Next.js", "Tailwind CSS", "MongoDB"],
     roles: "Fullstack Development",
     repoUrl: "https://github.com/orackle/url_shortener",
+    shaderColors: { color1: "#eab308", color2: "#713f12", color3: "#fde047" },
   },
 ];
 

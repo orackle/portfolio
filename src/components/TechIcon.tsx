@@ -319,6 +319,83 @@ function SoupBowlLogo() {
   );
 }
 
+function KafkaLogo() {
+  return (
+    <svg viewBox="0 0 10 12" width="10" height="12" shapeRendering="crispEdges" aria-hidden="true">
+      <rect x={0} y={5} width={2} height={2} fill="#231f20" />
+      <rect x={4} y={0} width={2} height={2} fill="#231f20" />
+      <rect x={4} y={5} width={2} height={2} fill="#231f20" />
+      <rect x={4} y={10} width={2} height={2} fill="#231f20" />
+      <rect x={2} y={5} width={2} height={2} fill="#231f20" />
+      <rect x={1} y={2} width={1} height={3} fill="#231f20" />
+      <rect x={1} y={7} width={1} height={3} fill="#231f20" />
+      <rect x={2} y={1} width={2} height={1} fill="#231f20" />
+      <rect x={2} y={10} width={2} height={1} fill="#231f20" />
+    </svg>
+  );
+}
+
+function FastApiLogo() {
+  return (
+    <svg viewBox="0 0 10 10" width="10" height="10" shapeRendering="crispEdges" aria-hidden="true">
+      <rect x={2} y={0} width={6} height={6} fill="#059688" />
+      <rect x={0} y={4} width={6} height={6} fill="#059688" />
+      <rect x={3} y={2} width={3} height={1} fill="#f5f6ff" />
+      <rect x={2} y={3} width={3} height={1} fill="#f5f6ff" />
+      <rect x={4} y={4} width={1} height={1} fill="#f5f6ff" />
+      <rect x={1} y={6} width={3} height={1} fill="#f5f6ff" />
+      <rect x={2} y={7} width={3} height={1} fill="#f5f6ff" />
+    </svg>
+  );
+}
+
+function ScikitLogo() {
+  return (
+    <svg viewBox="0 0 10 10" width="10" height="10" shapeRendering="crispEdges" aria-hidden="true">
+      <rect x={1} y={1} width={3} height={3} fill="#f7931e" />
+      <rect x={6} y={1} width={3} height={3} fill="#3499cd" />
+      <rect x={1} y={6} width={3} height={3} fill="#3499cd" />
+      <rect x={6} y={6} width={3} height={3} fill="#f7931e" />
+      <rect x={4} y={4} width={2} height={2} fill="#f5f6ff" />
+    </svg>
+  );
+}
+
+function WebSocketsLogo() {
+  return (
+    <svg viewBox="0 0 12 10" width="12" height="10" shapeRendering="crispEdges" aria-hidden="true">
+      <rect x={0} y={4} width={2} height={2} fill="#68a063" />
+      <rect x={10} y={4} width={2} height={2} fill="#68a063" />
+      <rect x={2} y={4} width={1} height={2} fill="#68a063" />
+      <rect x={9} y={4} width={1} height={2} fill="#68a063" />
+      <rect x={3} y={2} width={1} height={2} fill="#68a063" />
+      <rect x={3} y={6} width={1} height={2} fill="#68a063" />
+      <rect x={4} y={0} width={1} height={2} fill="#68a063" />
+      <rect x={4} y={8} width={1} height={2} fill="#68a063" />
+      <rect x={5} y={4} width={2} height={2} fill="#68a063" />
+      <rect x={8} y={2} width={1} height={2} fill="#68a063" />
+      <rect x={8} y={6} width={1} height={2} fill="#68a063" />
+      <rect x={7} y={0} width={1} height={2} fill="#68a063" />
+      <rect x={7} y={8} width={1} height={2} fill="#68a063" />
+    </svg>
+  );
+}
+
+function DockerLogo() {
+  return (
+    <svg viewBox="0 0 14 10" width="14" height="10" shapeRendering="crispEdges" aria-hidden="true">
+      <rect x={2} y={2} width={2} height={2} fill="#0db7ed" />
+      <rect x={5} y={2} width={2} height={2} fill="#0db7ed" />
+      <rect x={8} y={2} width={2} height={2} fill="#0db7ed" />
+      <rect x={2} y={5} width={2} height={2} fill="#0db7ed" />
+      <rect x={5} y={5} width={2} height={2} fill="#0db7ed" />
+      <rect x={8} y={5} width={2} height={2} fill="#0db7ed" />
+      <rect x={0} y={6} width={14} height={3} fill="#0db7ed" />
+      <rect x={11} y={4} width={2} height={2} fill="#0db7ed" />
+    </svg>
+  );
+}
+
 const LOGO_MAP: Record<string, () => JSX.Element> = {
   python: PythonLogo,
   javascript: JavaScriptLogo,
@@ -335,6 +412,11 @@ const LOGO_MAP: Record<string, () => JSX.Element> = {
   "spring boot": () => <MongoLeaf color="#6cbf4a" />,
   jupyter: JupyterLogo,
   beautifulsoup: SoupBowlLogo,
+  kafka: KafkaLogo,
+  fastapi: FastApiLogo,
+  "scikit-learn": ScikitLogo,
+  websockets: WebSocketsLogo,
+  docker: DockerLogo,
 };
 
 export default function TechIcon({ tech, className }: { tech: string; className?: string }) {
