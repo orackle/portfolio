@@ -109,6 +109,28 @@ export const projects: Project[] = [
     shaderColors: { color1: "#ff6a1a", color2: "#c73c00", color3: "#FD4912" },
   },
   {
+    slug: "factcheck-agent",
+    title: "Fact-Check Agent",
+    category: "ml",
+    year: "2026",
+    image: "/images/factcheck-agent.gif",
+    coverImage: "/images/factcheck-agent-hero.gif",
+    summary: "Multi-step LangGraph agent, 90% accuracy, cited verdicts",
+    overview:
+      "A LangGraph agent that verifies claims against live web sources: plans queries, searches, reads pages, extracts evidence, reflects on confidence, loops back to search if needed, then synthesizes a cited verdict.",
+    quote: "A model shouldn't grade its own homework after one search.",
+    body: [
+      "Plan → search → fetch → extract → reflect → synthesize. The reflect step can send the loop back to search again (capped by MAX_SEARCH_ITERATIONS) instead of committing to a verdict on thin evidence.",
+      "Every claim in the output is tied to a source URL and an exact quote — no uncited claims. Pluggable LLM (Ollama, OpenAI, Anthropic) and search provider (DuckDuckGo, Tavily).",
+      "Eval: 90% (9/10) on a labeled 10-claim test set with llama3.2:3B running locally on CPU. Average 271s/claim. The one miss is documented, not hidden: agent correctly extracted evidence and stance, but the source repeated a historical myth — a retrieval-quality problem, not a graph-wiring bug.",
+    ],
+    stack: ["LangGraph", "Python", "FastAPI", "Ollama", "BeautifulSoup"],
+    roles: "Agent Design, Eval, Backend Development",
+    repoUrl: "https://github.com/orackle/factcheck-agent",
+    featured: true,
+    shaderColors: { color1: "#0d9488", color2: "#134e4a", color3: "#5eead4" },
+  },
+  {
     slug: "neuron",
     title: "Neuron — Code Snippet Saving Tool",
     category: "digital",

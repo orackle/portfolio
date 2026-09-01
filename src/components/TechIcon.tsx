@@ -8,7 +8,6 @@ interface FallbackDef {
 
 const FALLBACK_MAP: Record<string, FallbackDef> = {
   ebitengine: { kind: "package", color: "#e2543b" },
-  ollama: { kind: "package", color: "#8a8a8a" },
   oauth: { kind: "key", color: "#f2c14e" },
   bert: { kind: "chip", color: "#a78bfa" },
   "machine learning": { kind: "chip", color: "#a78bfa" },
@@ -396,6 +395,35 @@ function DockerLogo() {
   );
 }
 
+function LangGraphLogo() {
+  return (
+    <svg viewBox="0 0 12 10" width="12" height="10" shapeRendering="crispEdges" aria-hidden="true">
+      <rect x={0} y={0} width={2} height={2} fill="#1c1c1c" />
+      <rect x={0} y={8} width={2} height={2} fill="#1c1c1c" />
+      <rect x={10} y={4} width={2} height={2} fill="#1c1c1c" />
+      <rect x={1} y={1} width={1} height={3} fill="#1c1c1c" />
+      <rect x={1} y={6} width={1} height={3} fill="#1c1c1c" />
+      <rect x={2} y={4} width={7} height={1} fill="#1c1c1c" />
+      <rect x={2} y={1} width={1} height={1} fill="#1c1c1c" />
+      <rect x={2} y={8} width={1} height={1} fill="#1c1c1c" />
+    </svg>
+  );
+}
+
+function OllamaLogo() {
+  return (
+    <svg viewBox="0 0 10 12" width="10" height="12" shapeRendering="crispEdges" aria-hidden="true">
+      <rect x={2} y={0} width={2} height={3} fill="#f5f6ff" />
+      <rect x={6} y={0} width={2} height={3} fill="#f5f6ff" />
+      <rect x={1} y={3} width={8} height={6} fill="#f5f6ff" />
+      <rect x={2} y={9} width={6} height={2} fill="#f5f6ff" />
+      <rect x={3} y={5} width={1} height={2} fill="#1c1c1c" />
+      <rect x={6} y={5} width={1} height={2} fill="#1c1c1c" />
+      <rect x={4} y={8} width={2} height={1} fill="#1c1c1c" />
+    </svg>
+  );
+}
+
 const LOGO_MAP: Record<string, () => JSX.Element> = {
   python: PythonLogo,
   javascript: JavaScriptLogo,
@@ -417,6 +445,8 @@ const LOGO_MAP: Record<string, () => JSX.Element> = {
   "scikit-learn": ScikitLogo,
   websockets: WebSocketsLogo,
   docker: DockerLogo,
+  langgraph: LangGraphLogo,
+  ollama: OllamaLogo,
 };
 
 export default function TechIcon({ tech, className }: { tech: string; className?: string }) {
