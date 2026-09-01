@@ -78,7 +78,7 @@ export const projects: Project[] = [
     title: "Kafka Fleet Monitor — Real-Time Anomaly Detection",
     category: "systems",
     year: "2026",
-    image: "/images/kafka-fleet-monitor.png",
+    image: "/images/kafka-fleet-monitor.gif",
     summary: "Live telemetry pipeline with ML-based anomaly detection",
     overview:
       "A Kafka-backed fleet monitoring system that streams live node telemetry through an anomaly detector combining z-score bounds and Isolation Forest, with a real-time dashboard and fault-injection controls for testing detection under load.",
