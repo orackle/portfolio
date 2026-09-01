@@ -131,6 +131,27 @@ export const projects: Project[] = [
     shaderColors: { color1: "#0d9488", color2: "#134e4a", color3: "#5eead4" },
   },
   {
+    slug: "sentiment-api-prod",
+    title: "Sentiment API — Production ML Service",
+    category: "systems",
+    year: "2025",
+    image: "/images/sentiment-api-prod.png",
+    summary: "DistilBERT sentiment API, deployed on EKS with Terraform",
+    overview:
+      "A FastAPI service wrapping a DistilBERT sentiment model, built to survive real traffic: async inference, batch scoring, Prometheus metrics, and a Terraform config that stands up the full AWS deployment (EKS, VPC, ECR) from scratch.",
+    quote: "A model demo is one request. This had to hold up under a load test.",
+    body: [
+      "The API wraps a Hugging Face DistilBERT pipeline behind FastAPI, offloading CPU-bound inference to a thread pool so the event loop stays free to serve other requests. A batch endpoint scores a list of texts in one call instead of one request per text.",
+      "Every response carries an X-Request-ID header for tracing, and a Prometheus middleware tracks request counts, status codes, and latency per endpoint — the kind of observability a demo script skips but a production service needs.",
+      "Terraform provisions the AWS side end to end: an ECR repo, a VPC, and an EKS cluster with an autoscaling node group. Kubernetes manifests handle health-checked rollouts and horizontal pod autoscaling. Load-tested with Locust to check latency held up under concurrent users, not just single requests.",
+    ],
+    stack: ["FastAPI", "PyTorch", "Transformers", "Docker", "Kubernetes", "Terraform", "AWS", "Prometheus"],
+    roles: "Backend Development, ML Deployment, Infrastructure",
+    repoUrl: "https://github.com/orackle/sentiment-api-prod",
+    featured: true,
+    shaderColors: { color1: "#4338ca", color2: "#1e1b4b", color3: "#a5b4fc" },
+  },
+  {
     slug: "neuron",
     title: "Neuron — Code Snippet Saving Tool",
     category: "digital",
