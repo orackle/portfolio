@@ -1,4 +1,4 @@
-export type ProjectCategory = "digital" | "systems" | "ml";
+export type ProjectCategory = "fullstack" | "systems" | "ai";
 
 export interface ShaderPalette {
   color1: string;
@@ -30,7 +30,7 @@ export const projects: Project[] = [
   {
     slug: "aegis",
     title: "Aegis — Anti-Clickbait Extension",
-    category: "ml",
+    category: "ai",
     year: "2025",
     image: "/images/anti-clickbait.png",
     summary: "NLP sentiment scoring for clickbait detection",
@@ -46,6 +46,27 @@ export const projects: Project[] = [
     repoUrl: "https://github.com/orackle/aegis",
     featured: true,
     shaderColors: { color1: "#7c3aed", color2: "#4c1d95", color3: "#a78bfa" },
+  },
+  {
+    slug: "soma",
+    title: "Soma — Vedic Panchang & Jyotish",
+    category: "fullstack",
+    year: "2026",
+    image: "/images/soma-panchang.png",
+    summary: "Real-time Vedic astrology dashboard with a custom ephemeris engine",
+    overview:
+      "A Vedic Panchang and Jyotish dashboard that turns raw astronomical calculations — Tarabalam, Chandrabalam, Muhurta windows, Dasha periods — into a single daily directive, built as a Chrome extension PWA with a custom sidereal ephemeris engine underneath.",
+    quote: "Raw Panchang data is a table. The point was turning it into one clear answer for right now.",
+    body: [
+      "A custom ephemeris engine (Lahiri ayanamsa, sidereal positions) computes Tithi, Nakshatra, Yoga, Karana, and planetary hours in real time, then a synthesis layer merges Tarabalam, Chandrabalam, and Panchanga into one plain-language verdict instead of leaving the reader to interpret raw astrological data.",
+      "The Chronos timeline renders Abhijit, Rahu Kalam, Yamaganda, and Gulika as live, color-coded Choghadia/Hora windows with stacked and swimlane views, so favorable and unfavorable time slots are visible at a glance across the day.",
+      "A Kundli and Dasha navigator walks Vimshottari Dasha down through Antardasha and Pratyantardasha with progress tracking, and a yoga-detection pass flags configurations like Sarvartha Siddhi automatically rather than requiring manual lookup.",
+    ],
+    stack: ["React", "TypeScript", "Vite", "Chrome Extension", "Ephemeris Calculations"],
+    roles: "Fullstack Development, Astronomical Calculation Engine, UI Design",
+    repoUrl: "https://github.com/orackle/soma",
+    featured: true,
+    shaderColors: { color1: "#a3e635", color2: "#1a1a1a", color3: "#d9f99d" },
   },
   {
     slug: "kafka-fleet-monitor",
@@ -72,7 +93,7 @@ export const projects: Project[] = [
   {
     slug: "factcheck-agent",
     title: "Fact-Check Agent",
-    category: "ml",
+    category: "ai",
     year: "2026",
     image: "/images/factcheck-agent.gif",
     coverImage: "/images/factcheck-agent-hero.gif",
@@ -115,7 +136,7 @@ export const projects: Project[] = [
   {
     slug: "neuron",
     title: "Neuron — Code Snippet Saving Tool",
-    category: "digital",
+    category: "fullstack",
     year: "2024",
     image: "/images/neuron.png",
     summary: "AI-assisted snippet manager with Markdown support",
@@ -135,7 +156,7 @@ export const projects: Project[] = [
   {
     slug: "gdtuo-extension",
     title: "Gradient Descent Optimizer",
-    category: "ml",
+    category: "ai",
     year: "2024",
     image: "/images/gdtuo.png",
     summary: "Stacked hyperparameter optimization in PyTorch",
@@ -154,7 +175,7 @@ export const projects: Project[] = [
   {
     slug: "url-shortener",
     title: "URL Shortener",
-    category: "digital",
+    category: "fullstack",
     year: "2024",
     image: "/images/url-shortener.gif",
     summary: "Submit a long URL, get a short one back",
@@ -173,7 +194,7 @@ export const projects: Project[] = [
 
 export const categories: { label: string; value: "all" | ProjectCategory }[] = [
   { label: "All Projects", value: "all" },
-  { label: "Digital", value: "digital" },
+  { label: "AI/ML", value: "ai" },
   { label: "Systems", value: "systems" },
-  { label: "ML", value: "ml" },
+  { label: "Full-Stack", value: "fullstack" },
 ];
