@@ -37,7 +37,7 @@ export default function ProjectDetail() {
       </div>
 
       <div className="container">
-        <img src={project.image} alt={project.title} className="project-cover" />
+        <img src={project.coverImage ?? project.image} alt={project.title} className="project-cover" />
       </div>
 
       <div className="project-body">

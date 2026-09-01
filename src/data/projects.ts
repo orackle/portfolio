@@ -12,6 +12,8 @@ export interface Project {
   category: ProjectCategory;
   year: string;
   image: string;
+  /** Higher-quality asset for the project detail page hero; falls back to `image` when unset. */
+  coverImage?: string;
   summary: string;
   overview: string;
   quote: string;
@@ -90,6 +92,7 @@ export const projects: Project[] = [
     category: "systems",
     year: "2026",
     image: "/images/kafka-fleet-monitor.gif",
+    coverImage: "/images/kafka-fleet-monitor-hero.gif",
     summary: "Live telemetry pipeline with ML-based anomaly detection",
     overview:
       "A Kafka-backed fleet monitoring system that streams live node telemetry through an anomaly detector combining z-score bounds and Isolation Forest, with a real-time dashboard and fault-injection controls for testing detection under load.",
