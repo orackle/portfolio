@@ -132,6 +132,27 @@ export const projects: Project[] = [
     shaderColors: { color1: "#ff6a1a", color2: "#c73c00", color3: "#FD4912" },
   },
   {
+    slug: "wiki-frontlines",
+    title: "Wiki Frontlines",
+    category: "systems",
+    year: "2026",
+    image: "/images/wiki-frontlines.png",
+    summary: "Live map of Wikipedia edit wars, streamed in real time",
+    overview:
+      "A real-time dashboard that taps Wikimedia's live edit stream, geolocates each revision to the article's real-world subject, and flags edit wars as they break out — mutual reverts between two editors, or a mass pile-up of reverts on one page.",
+    quote: "Edit wars are usually invisible unless you're already watching the page. This makes them visible as they happen.",
+    body: [
+      "A Server-Sent Events connection to Wikimedia's recentchange stream feeds every edit through a war-detection pass: it tracks revert pairs per article and flags a war either when two editors revert each other back and forth, or when reverts pile up past a threshold regardless of who's involved.",
+      "Articles get geolocated two ways — coordinates from the Wikipedia API when the subject has them, or a language-to-region anchor point as a fallback — then rendered as pulsing flares on a custom D3 + Canvas map, with a heat overlay showing which countries are seeing the most contested edits this session.",
+      "Everything renders on raw Canvas for performance: the map, the flare animations, and a custom odometer-style digit-roll for the live stat counters, all built without a charting library.",
+    ],
+    stack: ["D3.js", "Canvas API", "Server-Sent Events", "JavaScript", "Wikimedia API"],
+    roles: "Frontend Development, Real-Time Data Visualization",
+    repoUrl: "https://github.com/orackle/wiki-frontlines",
+    featured: true,
+    shaderColors: { color1: "#d8a03c", color2: "#7a1a2e", color3: "#ff1f4f" },
+  },
+  {
     slug: "sentiment-api-prod",
     title: "Sentiment API: Production ML Service",
     category: "systems",
